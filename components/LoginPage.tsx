@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Leaf, Lock, Mail, Loader2 } from 'lucide-react';
-import { User } from '../types';
-import { CURRENT_USER } from '../services/mockData';
+import { User } from '../types.ts';
+import { CURRENT_USER } from '../services/mockData.ts';
 
 interface LoginPageProps {
   onLoginSuccess: (user: User) => void;

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { Menu, X, Leaf, User as UserIcon, LogOut } from 'lucide-react';
-import { User, ViewState } from '../types';
+import { Menu, X, Leaf, LogOut, ArrowRight } from 'lucide-react';
+import { User, ViewState } from '../types.ts';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -27,10 +27,10 @@ export const Layout: React.FC<LayoutProps> = ({
         onNavigate(view);
         setIsMobileMenuOpen(false);
       }}
-      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+      className={`text-sm font-bold tracking-tight transition-colors ${
         currentView === view 
-          ? 'bg-emerald-100 text-emerald-700' 
-          : 'text-gray-600 hover:text-emerald-600 hover:bg-emerald-50'
+          ? 'text-emerald-700' 
+          : 'text-gray-500 hover:text-gray-800'
       }`}
     >
       {label}
@@ -38,153 +38,133 @@ export const Layout: React.FC<LayoutProps> = ({
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50">
+    <div className="min-h-screen bg-white font-sans flex flex-col">
       {/* Navigation */}
-      <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-16">
-            <div className="flex items-center">
-              <div 
-                className="flex-shrink-0 flex items-center cursor-pointer"
-                onClick={() => onNavigate('landing')}
-              >
-                <Leaf className="h-8 w-8 text-emerald-600" />
-                <span className="ml-2 text-xl font-bold text-gray-900 tracking-tight">Andromeda</span>
-              </div>
-              <div className="hidden sm:ml-8 sm:flex sm:space-x-4">
-                <NavLink view="landing" label="Home" />
-                <NavLink view="library" label="Content Library" />
-                <NavLink view="work" label="Our Work" />
-                <NavLink view="about" label="About Us" />
-                {user?.role === 'admin' && (
-                  <NavLink view="dashboard" label="Admin Dashboard" />
-                )}
-              </div>
-            </div>
+      <nav className="w-full bg-white z-50 border-b border-transparent">
+        <div className="max-w-[1440px] mx-auto px-6 py-6 md:px-10 relative">
+          <div className="flex justify-between items-center h-12">
             
-            <div className="hidden sm:flex sm:items-center sm:ml-6">
+            {/* Left: Logo */}
+            <div 
+              className="flex items-center gap-2 cursor-pointer z-10"
+              onClick={() => onNavigate('landing')}
+            >
+              <div className="bg-emerald-900 p-2 rounded-xl text-white">
+                <Leaf className="h-5 w-5" />
+              </div>
+              <span className="text-xl font-bold text-gray-900 tracking-tight">Andromeda</span>
+            </div>
+
+            {/* Center: Links (Absolute positioned to ensure true centering) */}
+            {currentView !== 'dashboard' && (
+              <div className="hidden md:flex absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 items-center space-x-10">
+                <NavLink view="landing" label="Home" />
+                <NavLink view="about" label="About us" />
+                <NavLink view="library" label="Library" />
+                <NavLink view="work" label="Our Work" />
+              </div>
+            )}
+            
+            {/* Right: Auth / User Profile */}
+            <div className="hidden md:flex items-center z-10">
               {user ? (
-                <div className="flex items-center space-x-4">
-                  <div className="flex items-center space-x-2">
-                    <img className="h-8 w-8 rounded-full bg-emerald-100" src={user.avatarUrl} alt={user.name} />
-                    <span className="text-sm font-medium text-gray-700">{user.name}</span>
-                  </div>
+                <div 
+                  onClick={() => user.role === 'admin' && onNavigate('dashboard')}
+                  className="flex items-center gap-3 bg-[#F3F4F6] pl-1 pr-3 py-1 rounded-full border border-gray-100 shadow-sm transition-shadow hover:shadow-md cursor-pointer group"
+                  title={user.role === 'admin' ? "Go to Dashboard" : "User Profile"}
+                >
+                  <img 
+                    className="h-9 w-9 rounded-full object-cover border-2 border-white" 
+                    src={user.avatarUrl} 
+                    alt={user.name} 
+                  />
+                  <span className="text-sm font-bold text-gray-700">{user.name}</span>
                   <button 
-                    onClick={onLogout}
-                    className="p-1 rounded-full text-gray-400 hover:text-red-500 focus:outline-none"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      onLogout();
+                    }}
+                    className="text-gray-400 group-hover:text-red-500 transition-colors ml-1"
                     title="Logout"
                   >
-                    <LogOut className="h-5 w-5" />
+                    <LogOut className="h-4 w-4" />
                   </button>
                 </div>
               ) : (
                 <button
                   onClick={onLogin}
-                  className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500"
+                  className="inline-flex items-center px-6 py-2.5 border border-transparent text-sm font-bold rounded-full text-white bg-emerald-900 hover:bg-emerald-800 transition-all hover:shadow-lg transform hover:-translate-y-0.5"
                 >
                   Log In
                 </button>
               )}
             </div>
 
-            <div className="flex items-center sm:hidden">
+            {/* Mobile Menu Button */}
+            <div className="flex items-center md:hidden z-10">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none"
+                className="text-gray-500 hover:text-gray-700 focus:outline-none"
               >
-                {isMobileMenuOpen ? <X className="block h-6 w-6" /> : <Menu className="block h-6 w-6" />}
+                {isMobileMenuOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
               </button>
             </div>
           </div>
-        </div>
 
-        {/* Mobile menu */}
-        {isMobileMenuOpen && (
-          <div className="sm:hidden bg-white border-t border-gray-200">
-            <div className="pt-2 pb-3 space-y-1 px-4">
-              <NavLink view="landing" label="Home" />
-              <NavLink view="library" label="Content Library" />
-              <NavLink view="work" label="Our Work" />
-              <NavLink view="about" label="About Us" />
-              {user?.role === 'admin' && (
-                <NavLink view="dashboard" label="Dashboard" />
-              )}
-            </div>
-            <div className="pt-4 pb-4 border-t border-gray-200 px-4">
-              {user ? (
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <img className="h-10 w-10 rounded-full" src={user.avatarUrl} alt="" />
-                    <div className="ml-3">
-                      <div className="text-base font-medium text-gray-800">{user.name}</div>
-                      <div className="text-sm font-medium text-gray-500">{user.email}</div>
-                    </div>
-                  </div>
-                  <button onClick={onLogout} className="text-gray-400 hover:text-red-500">
-                    <LogOut className="h-6 w-6" />
+          {/* Mobile Menu Dropdown */}
+          {isMobileMenuOpen && (
+            <div className="md:hidden mt-6 bg-gray-50 rounded-2xl p-6 space-y-4 animate-in slide-in-from-top-4 fade-in absolute left-4 right-4 top-16 shadow-xl border border-gray-100 z-50">
+              <div className="flex flex-col space-y-4 items-center">
+                <NavLink view="landing" label="Home" />
+                <NavLink view="about" label="About us" />
+                <NavLink view="library" label="Library" />
+                <NavLink view="work" label="Our Work" />
+                {user?.role === 'admin' && (
+                  <button
+                    onClick={() => {
+                      onNavigate('dashboard');
+                      setIsMobileMenuOpen(false);
+                    }}
+                    className={`text-sm font-bold tracking-tight transition-colors ${
+                      currentView === 'dashboard'
+                        ? 'text-emerald-700' 
+                        : 'text-gray-500 hover:text-gray-800'
+                    }`}
+                  >
+                    Dashboard
                   </button>
-                </div>
-              ) : (
-                <button
-                  onClick={() => {
-                    onLogin();
-                    setIsMobileMenuOpen(false);
-                  }}
-                  className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700"
-                >
-                  Log In
-                </button>
-              )}
+                )}
+              </div>
+              <div className="pt-4 border-t border-gray-200 flex justify-center">
+                {user ? (
+                   <button onClick={onLogout} className="text-red-500 font-bold text-sm flex items-center">
+                     <LogOut className="w-4 h-4 mr-2" /> Log out
+                   </button>
+                ) : (
+                   <button onClick={onLogin} className="text-emerald-800 font-bold text-sm">Log in</button>
+                )}
+              </div>
             </div>
-          </div>
-        )}
+          )}
+        </div>
       </nav>
 
-      <main className="flex-grow">
+      {/* Content Area */}
+      <main className="flex-grow flex flex-col w-full max-w-[1440px] mx-auto">
         {children}
       </main>
 
+      {/* Minimal Footer */}
       {currentView !== 'dashboard' && currentView !== 'login' && (
-        <footer className="bg-gray-900 text-white border-t border-gray-800">
-          <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-              <div className="col-span-1 md:col-span-1">
-                <div className="flex items-center space-x-2">
-                  <Leaf className="h-6 w-6 text-emerald-400" />
-                  <span className="text-lg font-bold">Andromeda</span>
-                </div>
-                <p className="mt-2 text-sm text-gray-400">
-                  Empowering your health journey with science-backed nutritional education.
-                </p>
+        <footer className="w-full border-t border-gray-100 bg-white">
+           <div className="max-w-[1440px] mx-auto px-6 py-8 md:px-12 flex flex-col md:flex-row justify-between items-center text-sm text-gray-400">
+              <p>&copy; 2026 Andromeda Health.</p>
+              <div className="flex space-x-6 mt-4 md:mt-0">
+                <a href="#" className="hover:text-gray-600">Privacy</a>
+                <a href="#" className="hover:text-gray-600">Terms</a>
+                <a href="#" className="hover:text-gray-600">Twitter</a>
               </div>
-              <div>
-                <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">Platform</h3>
-                <ul className="mt-4 space-y-4">
-                  <li><button onClick={() => onNavigate('library')} className="text-base text-gray-300 hover:text-white">Content Library</button></li>
-                  <li><button onClick={() => onNavigate('work')} className="text-base text-gray-300 hover:text-white">Our Work</button></li>
-                  <li><button onClick={() => onNavigate('about')} className="text-base text-gray-300 hover:text-white">Experts</button></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">Company</h3>
-                <ul className="mt-4 space-y-4">
-                  <li><button onClick={() => onNavigate('about')} className="text-base text-gray-300 hover:text-white">About Us</button></li>
-                  <li><button onClick={() => onNavigate('library')} className="text-base text-gray-300 hover:text-white">Blog</button></li>
-                  <li><button onClick={() => onNavigate('work')} className="text-base text-gray-300 hover:text-white">Careers</button></li>
-                </ul>
-              </div>
-              <div>
-                <h3 className="text-sm font-semibold text-gray-400 tracking-wider uppercase">Legal</h3>
-                <ul className="mt-4 space-y-4">
-                  <li><a href="#" className="text-base text-gray-300 hover:text-white">Privacy Policy</a></li>
-                  <li><a href="#" className="text-base text-gray-300 hover:text-white">Terms of Service</a></li>
-                </ul>
-              </div>
-            </div>
-            <div className="mt-8 border-t border-gray-700 pt-8 text-center text-sm text-gray-400">
-              &copy; 2026 Andromeda Health. All rights reserved.
-            </div>
-          </div>
+           </div>
         </footer>
       )}
     </div>

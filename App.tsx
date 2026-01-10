@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { Layout } from './components/Layout';
-import { LandingPage } from './components/LandingPage';
-import { Dashboard } from './components/Dashboard';
-import { LoginPage } from './components/LoginPage';
-import { AboutPage } from './components/AboutPage';
-import { WorkPage } from './components/WorkPage';
-import { User, ViewState, BlogPost } from './types';
-import { fetchPosts } from './services/contentService';
+import { Layout } from './components/Layout.tsx';
+import { LandingPage } from './components/LandingPage.tsx';
+import { Dashboard } from './components/Dashboard.tsx';
+import { LoginPage } from './components/LoginPage.tsx';
+import { AboutPage } from './components/AboutPage.tsx';
+import { WorkPage } from './components/WorkPage.tsx';
+import { User, ViewState, BlogPost } from './types.ts';
+import { fetchPosts } from './services/contentService.ts';
 import { FileText } from 'lucide-react';
 
 const App: React.FC = () => {

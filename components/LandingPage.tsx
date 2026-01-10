@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { fetchPosts } from '../services/contentService';
-import { ViewState, BlogPost } from '../types';
-import { ArrowRight, Check, PlayCircle, Loader2 } from 'lucide-react';
+import { fetchPosts } from '../services/contentService.ts';
+import { ViewState, BlogPost } from '../types.ts';
+import { ArrowRight, Check, PlayCircle, Loader2, ArrowUpRight, ShieldCheck, HeartPulse, Zap } from 'lucide-react';
+import { LineChart, Line, ResponsiveContainer } from 'recharts';
 
 interface LandingPageProps {
   onNavigate: (view: ViewState) => void;
 }
+
+const TINY_CHART_DATA = [
+  { val: 20 }, { val: 40 }, { val: 35 }, { val: 50 }, { val: 45 }, { val: 70 }, { val: 85 }
+];
 
 export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
   const [latestPosts, setLatestPosts] = useState<BlogPost[]>([]);
@@ -21,198 +26,201 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
   }, []);
 
   return (
-    <div className="bg-white">
+    <div className="bg-white px-4 md:px-12 pb-12">
+      
       {/* Hero Section */}
-      <div className="relative overflow-hidden bg-slate-50 pt-16 pb-32">
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="lg:grid lg:grid-cols-12 lg:gap-8">
-            <div className="sm:text-center md:max-w-2xl md:mx-auto lg:col-span-6 lg:text-left">
-              <h1 className="text-4xl tracking-tight font-extrabold text-gray-900 sm:text-5xl md:text-6xl lg:text-5xl xl:text-6xl">
-                <span className="block xl:inline">Master your health with</span>{' '}
-                <span className="block text-emerald-600 xl:inline">science-backed nutrition</span>
-              </h1>
-              <p className="mt-3 text-base text-gray-500 sm:mt-5 sm:text-lg sm:max-w-xl sm:mx-auto md:mt-5 md:text-xl lg:mx-0">
-                Join thousands of health-conscious individuals and professionals learning the truth about food, metabolism, and wellness. No fads, just facts.
-              </p>
-              <div className="mt-8 sm:max-w-lg sm:mx-auto sm:text-center lg:text-left lg:mx-0">
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-                  <button
-                    onClick={() => onNavigate('library')}
-                    className="block w-full rounded-md border border-transparent px-5 py-3 bg-emerald-600 text-base font-medium text-white shadow hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 sm:px-10"
-                  >
-                    Start Learning
-                  </button>
-                  <button
-                    className="flex items-center justify-center w-full rounded-md border border-transparent px-5 py-3 bg-emerald-100 text-base font-medium text-emerald-700 hover:bg-emerald-200 focus:outline-none sm:px-10"
-                  >
-                    <PlayCircle className="w-5 h-5 mr-2" />
-                    Watch Demo
-                  </button>
-                </div>
-              </div>
-            </div>
-            <div className="mt-12 relative sm:max-w-lg sm:mx-auto lg:mt-0 lg:max-w-none lg:mx-0 lg:col-span-6 lg:flex lg:items-center">
-              <div className="relative mx-auto w-full rounded-lg shadow-lg lg:max-w-md overflow-hidden">
-                 <img
-                    className="w-full h-full object-cover"
-                    src="https://picsum.photos/id/429/800/600"
-                    alt="Healthy food bowl"
-                  />
-              </div>
-            </div>
-          </div>
+      <div className="relative rounded-[3rem] bg-[#89A8B2] overflow-hidden min-h-[500px] flex items-center mb-12">
+        {/* Overlay Image Background */}
+        <div className="absolute inset-0 z-0">
+          <img 
+            src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?ixlib=rb-4.0.3&auto=format&fit=crop&w=2000&q=80"
+            className="w-full h-full object-cover opacity-90 mix-blend-overlay"
+            alt="Community"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#597E8D] to-transparent opacity-90"></div>
         </div>
-      </div>
 
-      {/* Feature Section */}
-      <div className="py-16 bg-white overflow-hidden lg:py-24">
-        <div className="relative max-w-xl mx-auto px-4 sm:px-6 lg:px-8 lg:max-w-7xl">
-          <div className="relative">
-            <h2 className="text-center text-3xl leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
-              Why Andromeda?
-            </h2>
-            <p className="mt-4 max-w-3xl mx-auto text-center text-xl text-gray-500">
-              We bridge the gap between complex nutritional science and daily dietary choices.
-            </p>
+        <div className="relative z-10 w-full max-w-4xl mx-auto text-center px-4 py-16">
+          <div className="inline-flex items-center px-3 py-1 rounded-full bg-white/20 text-white text-sm font-medium backdrop-blur-sm mb-6">
+            <HeartPulse className="w-4 h-4 mr-2" />
+            Science-backed Nutrition
           </div>
-
-          <div className="relative mt-12 lg:mt-24 lg:grid lg:grid-cols-2 lg:gap-8 lg:items-center">
-            <div className="relative">
-              <h3 className="text-2xl font-extrabold text-gray-900 tracking-tight sm:text-3xl">
-                Evidence-Based Content
-              </h3>
-              <p className="mt-3 text-lg text-gray-500">
-                Every article, video, and guide is reviewed by certified nutritionists and backed by peer-reviewed research.
-              </p>
-
-              <dl className="mt-10 space-y-10">
-                <div className="relative">
-                  <dt>
-                    <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-emerald-500 text-white">
-                      <Check className="h-6 w-6" aria-hidden="true" />
-                    </div>
-                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Curated Learning Paths</p>
-                  </dt>
-                  <dd className="mt-2 ml-16 text-base text-gray-500">
-                    Whether you're vegan, keto, or just eating clean, we have structured guides for you.
-                  </dd>
-                </div>
-                <div className="relative">
-                  <dt>
-                    <div className="absolute flex items-center justify-center h-12 w-12 rounded-md bg-emerald-500 text-white">
-                      <Check className="h-6 w-6" aria-hidden="true" />
-                    </div>
-                    <p className="ml-16 text-lg leading-6 font-medium text-gray-900">Interactive Tools</p>
-                  </dt>
-                  <dd className="mt-2 ml-16 text-base text-gray-500">
-                    Use our calorie calculators and meal planners to put theory into practice.
-                  </dd>
-                </div>
-              </dl>
-            </div>
-
-            <div className="mt-10 -mx-4 relative lg:mt-0" aria-hidden="true">
-              <img
-                className="relative mx-auto rounded-lg shadow-lg"
-                width={490}
-                src="https://picsum.photos/id/365/490/490"
-                alt="Nutrition planning"
-              />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Latest Articles */}
-      <div className="bg-slate-50 pt-16 pb-20 px-4 sm:px-6 lg:pt-24 lg:pb-28 lg:px-8">
-        <div className="relative max-w-7xl mx-auto">
-          <div className="text-center">
-            <h2 className="text-3xl tracking-tight font-extrabold text-gray-900 sm:text-4xl">
-              Latest from the Lab
-            </h2>
-            <p className="mt-3 max-w-2xl mx-auto text-xl text-gray-500 sm:mt-4">
-              Fresh insights on nutrition, health, and wellness.
-            </p>
-          </div>
-          
-          {isLoading ? (
-             <div className="flex justify-center mt-12">
-               <Loader2 className="animate-spin h-8 w-8 text-emerald-600" />
-             </div>
-          ) : (
-            <div className="mt-12 max-w-lg mx-auto grid gap-5 lg:grid-cols-3 lg:max-w-none">
-              {latestPosts.map((post) => (
-                <div key={post.id} className="flex flex-col rounded-lg shadow-lg overflow-hidden transition-transform hover:-translate-y-1">
-                  <div className="flex-shrink-0">
-                    <img className="h-48 w-full object-cover" src={post.imageUrl} alt={post.title} />
-                  </div>
-                  <div className="flex-1 bg-white p-6 flex flex-col justify-between">
-                    <div className="flex-1">
-                      <p className="text-sm font-medium text-emerald-600">
-                        {post.category}
-                      </p>
-                      <div className="block mt-2">
-                        <p className="text-xl font-semibold text-gray-900">{post.title}</p>
-                        <p className="mt-3 text-base text-gray-500">{post.excerpt}</p>
-                      </div>
-                    </div>
-                    <div className="mt-6 flex items-center">
-                      <div className="flex-shrink-0">
-                        <span className="sr-only">{post.author}</span>
-                        <div className="h-10 w-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-700 font-bold">
-                          {post.author.charAt(0)}
-                        </div>
-                      </div>
-                      <div className="ml-3">
-                        <p className="text-sm font-medium text-gray-900">{post.author}</p>
-                        <div className="flex space-x-1 text-sm text-gray-500">
-                          <time dateTime={post.date}>{post.date}</time>
-                          <span aria-hidden="true">&middot;</span>
-                          <span>{post.readTime}</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-          
-          <div className="mt-10 text-center">
-            <button
-               onClick={() => onNavigate('library')}
-               className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-emerald-700 bg-emerald-100 hover:bg-emerald-200"
+          <h1 className="text-4xl md:text-6xl font-bold text-white tracking-tight mb-6 leading-tight">
+            Fueling life growth through <br/> nutritional well-being
+          </h1>
+          <p className="text-lg md:text-xl text-blue-50 mb-10 max-w-2xl mx-auto leading-relaxed">
+            Join a community of professionals and health enthusiasts. We provide the tools, research, and guidance you need to thrive.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+            <button 
+              onClick={() => onNavigate('library')}
+              className="px-8 py-4 bg-white text-[#597E8D] rounded-full font-bold hover:bg-blue-50 transition-colors shadow-lg"
             >
-              View All Articles <ArrowRight className="ml-2 h-5 w-5" />
+              Start Learning
+            </button>
+            <button className="px-8 py-4 bg-[#597E8D] border border-white/30 text-white rounded-full font-bold hover:bg-[#4A6A76] transition-colors flex items-center backdrop-blur-sm">
+              <PlayCircle className="w-5 h-5 mr-2" />
+              Watch Demo
             </button>
           </div>
         </div>
       </div>
 
-      {/* Newsletter */}
-      <div className="bg-emerald-700">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:py-16 lg:px-8 lg:flex lg:items-center">
-          <div className="lg:w-0 lg:flex-1">
-            <h2 className="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-              Want nutritional tips?
-            </h2>
-            <p className="mt-3 max-w-3xl text-lg text-emerald-100">
-              Sign up for our weekly newsletter to get the latest research delivered to your inbox.
+      {/* Bento Grid Stats Section */}
+      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-20">
+        
+        {/* Card 1: Main Stat (Tall) */}
+        <div className="col-span-1 md:col-span-3 bg-[#E3F2FD] rounded-[2.5rem] p-8 flex flex-col justify-between h-80 transition-transform hover:-translate-y-1">
+          <div>
+            <h3 className="text-5xl font-extrabold text-[#1565C0] mb-2">10x</h3>
+            <p className="text-[#1E88E5] font-medium leading-snug">
+              More effective than traditional diet programs
             </p>
           </div>
-          <div className="mt-8 lg:mt-0 lg:ml-8">
-            <form className="sm:flex">
-              <label htmlFor="email-address" className="sr-only">Email address</label>
-              <input id="email-address" name="email-address" type="email" autoComplete="email" required className="w-full px-5 py-3 border border-transparent placeholder-gray-500 focus:ring-2 focus:ring-offset-2 focus:ring-offset-emerald-700 focus:ring-white focus:border-white sm:max-w-xs rounded-md" placeholder="Enter your email" />
-              <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3 sm:flex-shrink-0">
-                <button type="submit" className="w-full flex items-center justify-center px-5 py-3 border border-transparent text-base font-medium rounded-md text-emerald-600 bg-white hover:bg-emerald-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-emerald-700 focus:ring-white">
-                  Notify me
-                </button>
-              </div>
-            </form>
+          <div className="bg-white/40 h-24 rounded-2xl backdrop-blur-sm relative overflow-hidden p-4">
+             <ResponsiveContainer width="100%" height="100%">
+               <LineChart data={TINY_CHART_DATA}>
+                 <Line type="monotone" dataKey="val" stroke="#1565C0" strokeWidth={3} dot={false} />
+               </LineChart>
+             </ResponsiveContainer>
           </div>
         </div>
+
+        {/* Card 2: Returning Customers (Wide) */}
+        <div className="col-span-1 md:col-span-5 bg-[#F0FDF4] rounded-[2.5rem] p-8 relative overflow-hidden transition-transform hover:-translate-y-1">
+          <div className="flex justify-between items-start mb-6">
+            <div>
+              <div className="flex items-center gap-2 mb-2">
+                 <div className="bg-emerald-100 p-2 rounded-full">
+                    <Zap className="w-4 h-4 text-emerald-600" />
+                 </div>
+                 <span className="text-emerald-800 font-bold text-sm uppercase tracking-wider">Growth</span>
+              </div>
+              <h3 className="text-2xl font-bold text-gray-900">Returning Health Seekers</h3>
+            </div>
+            <div className="bg-emerald-200 text-emerald-800 px-3 py-1 rounded-full text-xs font-bold">
+              +20,000
+            </div>
+          </div>
+          <div className="h-40 w-full mt-4">
+            <ResponsiveContainer width="100%" height="100%">
+               <LineChart data={TINY_CHART_DATA}>
+                 <Line type="basis" dataKey="val" stroke="#10B981" strokeWidth={4} dot={false} />
+                 <defs>
+                   <linearGradient id="colorVal" x1="0" y1="0" x2="0" y2="1">
+                     <stop offset="5%" stopColor="#10B981" stopOpacity={0.1}/>
+                     <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
+                   </linearGradient>
+                 </defs>
+               </LineChart>
+             </ResponsiveContainer>
+          </div>
+          <p className="text-emerald-600 text-sm mt-2">Consistent engagement across 40+ countries.</p>
+        </div>
+
+        {/* Card 3: Satisfaction (Square) */}
+        <div className="col-span-1 md:col-span-4 bg-white border border-gray-100 shadow-xl shadow-gray-100/50 rounded-[2.5rem] p-8 flex flex-col justify-center items-center text-center transition-transform hover:-translate-y-1">
+          <div className="relative">
+             <div className="text-6xl font-black text-gray-900 mb-2">88%</div>
+             <ShieldCheck className="w-8 h-8 text-emerald-500 absolute -top-2 -right-6" />
+          </div>
+          <p className="text-gray-500 font-medium">
+            Of members see clinical improvement in their metabolic health within 3 months.
+          </p>
+        </div>
+
+        {/* Card 4: Savings (Square) */}
+        <div className="col-span-1 md:col-span-4 bg-[#FFF8E1] rounded-[2.5rem] p-8 flex flex-col justify-between transition-transform hover:-translate-y-1">
+           <div>
+             <h3 className="text-3xl font-bold text-amber-900">$614k</h3>
+             <p className="text-amber-800/80 text-sm mt-1">Healthcare savings generated for our community members.</p>
+           </div>
+           <div className="flex -space-x-3 mt-4">
+              {[1,2,3,4].map(i => (
+                <img key={i} className="w-10 h-10 rounded-full border-2 border-white" src={`https://picsum.photos/id/${100+i}/100/100`} alt="User" />
+              ))}
+              <div className="w-10 h-10 rounded-full border-2 border-white bg-amber-200 flex items-center justify-center text-xs font-bold text-amber-800">+2k</div>
+           </div>
+        </div>
+
+         {/* Card 5: Mobile App (Wide with Image) */}
+         <div className="col-span-1 md:col-span-8 bg-[#EEF2FF] rounded-[2.5rem] p-8 md:p-0 flex flex-col md:flex-row items-center overflow-hidden transition-transform hover:-translate-y-1">
+            <div className="p-8 md:p-12 md:w-1/2">
+               <div className="inline-block bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold mb-4">
+                 NEW FEATURE
+               </div>
+               <h3 className="text-3xl font-bold text-gray-900 mb-4">Expert access in your pocket</h3>
+               <p className="text-gray-600 mb-6">
+                 Connect with certified nutritionists directly through our platform. Get personalized advice anytime, anywhere.
+               </p>
+               <button onClick={() => onNavigate('work')} className="text-indigo-600 font-bold flex items-center hover:underline">
+                 Learn about our specialists <ArrowRight className="w-4 h-4 ml-2" />
+               </button>
+            </div>
+            <div className="md:w-1/2 h-full flex items-end justify-center bg-indigo-50">
+               <img 
+                 src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
+                 className="w-full h-full object-cover md:rounded-tl-[2.5rem]"
+                 alt="Doctor"
+               />
+            </div>
+         </div>
       </div>
+
+      {/* Latest Content Preview */}
+      <div className="mb-12">
+        <div className="flex justify-between items-end mb-8 px-2">
+           <div>
+             <h2 className="text-3xl font-bold text-gray-900">Latest from the Lab</h2>
+             <p className="text-gray-500 mt-2">Fresh insights and research summaries.</p>
+           </div>
+           <button onClick={() => onNavigate('library')} className="hidden md:flex items-center text-emerald-800 font-bold hover:text-emerald-600">
+             View Library <ArrowUpRight className="w-4 h-4 ml-1" />
+           </button>
+        </div>
+
+        {isLoading ? (
+          <div className="flex justify-center py-12">
+            <Loader2 className="animate-spin h-8 w-8 text-emerald-500" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {latestPosts.map((post) => (
+              <div key={post.id} className="group cursor-pointer" onClick={() => onNavigate('library')}>
+                <div className="rounded-[2rem] overflow-hidden mb-4 h-64 shadow-sm group-hover:shadow-md transition-shadow">
+                  <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" />
+                </div>
+                <div className="px-2">
+                  <span className="text-xs font-bold text-emerald-600 uppercase tracking-wide bg-emerald-50 px-2 py-1 rounded-md">{post.category}</span>
+                  <h3 className="text-xl font-bold text-gray-900 mt-3 mb-2 leading-snug group-hover:text-emerald-700 transition-colors">{post.title}</h3>
+                  <p className="text-gray-500 text-sm line-clamp-2">{post.excerpt}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Newsletter Block */}
+      <div className="bg-[#1F2937] rounded-[2.5rem] p-12 text-center md:text-left md:flex md:items-center md:justify-between">
+         <div className="mb-8 md:mb-0 md:w-1/2">
+           <h2 className="text-3xl font-bold text-white mb-4">Join 50k+ Health Enthusiasts</h2>
+           <p className="text-gray-400 text-lg">Get weekly nutrition tips and myth-busting research directly in your inbox.</p>
+         </div>
+         <div className="md:w-5/12">
+            <div className="flex flex-col sm:flex-row gap-3">
+               <input 
+                 type="email" 
+                 placeholder="Enter your email" 
+                 className="flex-1 px-6 py-4 rounded-full bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-emerald-500"
+               />
+               <button className="px-8 py-4 bg-emerald-500 text-white font-bold rounded-full hover:bg-emerald-400 transition-colors">
+                 Subscribe
+               </button>
+            </div>
+         </div>
+      </div>
+
     </div>
   );
 };
