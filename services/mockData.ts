@@ -1,4 +1,4 @@
-import { BlogPost, DashboardStat, User } from '../types';
+import { BlogPost, DashboardStat, User } from '../types.ts';
 
 export const CURRENT_USER: User = {
   id: 'u1',

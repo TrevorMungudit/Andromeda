@@ -59,13 +59,7 @@
 </script>
 </head>
   <body>
-    <div id="root">
-      <!-- Simple loading spinner while Babel compiles -->
-      <div style="height: 100vh; display: flex; align-items: center; justify-content: center; background: #f8fafc;">
-        <div style="width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top-color: #10b981; border-radius: 50%; animation: spin 1s linear infinite;"></div>
-        <style>@keyframes spin { to { transform: rotate(360deg); } }</style>
-      </div>
-    </div>
+    <div id="root"></div>
     <!-- Load index.tsx with Babel processing -->
     <script type="text/babel" data-type="module" data-presets="react,typescript" src="./index.tsx"></script>
   </body>

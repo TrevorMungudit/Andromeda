@@ -28,3 +28,12 @@ export const fetchPosts = async (): Promise<BlogPost[]> => {
       content: item.content || '',
       author: item.author || 'Andromeda Team',
       date: item.created_at ? new Date(item.created_at).toLocaleDateString() : new Date().toLocaleDateString(),
+      category: item.category || 'General',
+      imageUrl: item.image_url || 'https://picsum.photos/id/292/800/600',
+      readTime: item.read_time || '5 min read'
+    }));
+  } catch (err) {
+    console.error('Unexpected error fetching posts:', err);
+    return MOCK_POSTS;
+  }
+};
