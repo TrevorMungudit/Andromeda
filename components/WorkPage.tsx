@@ -1,9 +1,53 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { BookOpen, Activity, Globe, CheckCircle } from 'lucide-react';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 export const WorkPage: React.FC = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    // Header Animation
+    gsap.from(".work-header-content", {
+      y: 40,
+      opacity: 0,
+      duration: 1,
+      ease: "power3.out"
+    });
+
+    // Stats Animation
+    gsap.from(".stat-item", {
+        scrollTrigger: {
+            trigger: ".stats-container",
+            start: "top 85%"
+        },
+        y: 20,
+        opacity: 0,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: "power2.out"
+    });
+
+    // Initiatives Cards
+    gsap.from(".initiative-card", {
+        scrollTrigger: {
+            trigger: ".initiatives-grid",
+            start: "top 80%"
+        },
+        y: 50,
+        opacity: 0,
+        duration: 0.8,
+        stagger: 0.2,
+        ease: "power2.out"
+    });
+
+  }, { scope: containerRef });
+
   return (
-    <div className="bg-white">
+    <div ref={containerRef} className="bg-white">
       {/* Header */}
       <div className="relative bg-slate-900 py-24 px-4 sm:px-6 lg:px-8 overflow-hidden">
         <div className="absolute inset-0">
@@ -14,7 +58,7 @@ export const WorkPage: React.FC = () => {
           />
           <div className="absolute inset-0 bg-slate-900 mix-blend-multiply" />
         </div>
-        <div className="relative max-w-7xl mx-auto text-center">
+        <div className="work-header-content relative max-w-7xl mx-auto text-center">
           <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl lg:text-6xl">
             Our Work & Impact
           </h1>
@@ -26,7 +70,7 @@ export const WorkPage: React.FC = () => {
 
       {/* Stats */}
       <div className="bg-emerald-600">
-        <div className="max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+        <div className="stats-container max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 gap-8 md:grid-cols-4 text-center">
             {[
               { label: 'Articles Published', value: '1,200+' },
@@ -34,7 +78,7 @@ export const WorkPage: React.FC = () => {
               { label: 'Partner Clinics', value: '120' },
               { label: 'Research Citations', value: '500+' },
             ].map((stat) => (
-              <div key={stat.label} className="flex flex-col">
+              <div key={stat.label} className="stat-item flex flex-col">
                 <dt className="order-2 mt-2 text-lg leading-6 font-medium text-emerald-100">{stat.label}</dt>
                 <dd className="order-1 text-4xl font-extrabold text-white">{stat.value}</dd>
               </div>
@@ -53,8 +97,8 @@ export const WorkPage: React.FC = () => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-            <div className="bg-slate-50 rounded-2xl p-8 border border-slate-100 hover:shadow-lg transition-shadow">
+          <div className="initiatives-grid grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="initiative-card bg-slate-50 rounded-2xl p-8 border border-slate-100 hover:shadow-lg transition-shadow">
               <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-6">
                 <BookOpen className="w-6 h-6 text-blue-600" />
               </div>
@@ -69,7 +113,7 @@ export const WorkPage: React.FC = () => {
               </ul>
             </div>
 
-            <div className="bg-slate-50 rounded-2xl p-8 border border-slate-100 hover:shadow-lg transition-shadow">
+            <div className="initiative-card bg-slate-50 rounded-2xl p-8 border border-slate-100 hover:shadow-lg transition-shadow">
               <div className="w-12 h-12 bg-purple-100 rounded-lg flex items-center justify-center mb-6">
                 <Activity className="w-6 h-6 text-purple-600" />
               </div>
@@ -84,7 +128,7 @@ export const WorkPage: React.FC = () => {
               </ul>
             </div>
 
-            <div className="bg-slate-50 rounded-2xl p-8 border border-slate-100 hover:shadow-lg transition-shadow">
+            <div className="initiative-card bg-slate-50 rounded-2xl p-8 border border-slate-100 hover:shadow-lg transition-shadow">
               <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mb-6">
                 <Globe className="w-6 h-6 text-orange-600" />
               </div>

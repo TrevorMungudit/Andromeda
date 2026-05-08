@@ -1,7 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Leaf, Lock, Mail, Loader2 } from 'lucide-react';
 import { User } from '../types.ts';
 import { CURRENT_USER } from '../services/mockData.ts';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 interface LoginPageProps {
   onLoginSuccess: (user: User) => void;
@@ -12,6 +14,16 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const cardRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    gsap.from(cardRef.current, {
+        y: 30,
+        opacity: 0,
+        duration: 0.6,
+        ease: "power2.out"
+    });
+  }, { scope: cardRef });
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,7 +44,7 @@ export const LoginPage: React.FC<LoginPageProps> = ({ onLoginSuccess }) => {
 
   return (
     <div className="min-h-[calc(100vh-4rem)] flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8 bg-slate-50">
-      <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg border border-gray-100">
+      <div ref={cardRef} className="max-w-md w-full space-y-8 bg-white p-10 rounded-xl shadow-lg border border-gray-100">
         <div>
           <div className="mx-auto h-12 w-12 bg-emerald-100 rounded-full flex items-center justify-center">
              <Leaf className="h-6 w-6 text-emerald-600" />

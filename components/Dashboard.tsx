@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, AreaChart, Area
 } from 'recharts';
@@ -10,6 +10,8 @@ import { fetchPosts } from '../services/contentService.ts';
 import { generateBlogOutline } from '../services/geminiService.ts';
 import { NEON_API_URL } from '../services/supabaseClient.ts';
 import { AiGenerationState, BlogPost } from '../types.ts';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 export const Dashboard: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'overview' | 'posts' | 'ai-assistant'>('overview');
@@ -22,6 +24,8 @@ export const Dashboard: React.FC = () => {
     error: null
   });
   const [aiTopic, setAiTopic] = useState('');
+  
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const checkConnection = async () => {
@@ -50,6 +54,40 @@ export const Dashboard: React.FC = () => {
     loadPosts();
   }, []);
 
+  // GSAP Animation when tab changes
+  useGSAP(() => {
+    if (activeTab === 'overview') {
+       gsap.from(".stat-card", {
+          y: 30,
+          opacity: 0,
+          duration: 0.5,
+          stagger: 0.1,
+          ease: "power2.out"
+       });
+       gsap.from(".chart-section", {
+          y: 40,
+          opacity: 0,
+          duration: 0.6,
+          delay: 0.3,
+          ease: "power2.out"
+       });
+    } else if (activeTab === 'posts') {
+        gsap.from(".posts-table", {
+          y: 20,
+          opacity: 0,
+          duration: 0.5,
+          ease: "power2.out"
+        });
+    } else if (activeTab === 'ai-assistant') {
+        gsap.from(".ai-container", {
+            scale: 0.95,
+            opacity: 0,
+            duration: 0.5,
+            ease: "back.out(1.5)"
+        });
+    }
+  }, [activeTab]);
+
   const handleAiGenerate = async () => {
     if (!aiTopic.trim()) return;
     
@@ -70,7 +108,7 @@ export const Dashboard: React.FC = () => {
     <div className="space-y-6">
       <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
         {DASHBOARD_STATS.map((stat, idx) => (
-          <div key={stat.label} className={`rounded-[2rem] p-6 transition-shadow hover:shadow-md ${idx === 0 ? 'bg-[#E3F2FD]' : idx === 1 ? 'bg-[#F3E5F5]' : 'bg-[#FAFAFA] border border-gray-100'}`}>
+          <div key={stat.label} className={`stat-card rounded-[2rem] p-6 transition-shadow hover:shadow-md ${idx === 0 ? 'bg-[#E3F2FD]' : idx === 1 ? 'bg-[#F3E5F5]' : 'bg-[#FAFAFA] border border-gray-100'}`}>
             <div className="flex items-center justify-between mb-4">
                <div className={`p-3 rounded-full ${idx === 0 ? 'bg-blue-100 text-blue-600' : idx === 1 ? 'bg-purple-100 text-purple-600' : 'bg-gray-100 text-gray-600'}`}>
                   {stat.label.includes('User') && <Users className="h-5 w-5" />}
@@ -91,7 +129,7 @@ export const Dashboard: React.FC = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 bg-white border border-gray-100 shadow-sm rounded-[2.5rem] p-8">
+        <div className="chart-section lg:col-span-2 bg-white border border-gray-100 shadow-sm rounded-[2.5rem] p-8">
           <div className="flex items-center justify-between mb-8">
             <h3 className="text-xl font-bold text-gray-900">Engagement Overview</h3>
             <select className="bg-gray-50 border-none text-sm font-medium text-gray-500 rounded-lg px-3 py-2 cursor-pointer outline-none hover:bg-gray-100">
@@ -121,7 +159,7 @@ export const Dashboard: React.FC = () => {
           </div>
         </div>
         
-        <div className="bg-[#FFF8E1] rounded-[2.5rem] p-8">
+        <div className="chart-section bg-[#FFF8E1] rounded-[2.5rem] p-8">
           <h3 className="text-xl font-bold text-gray-900 mb-6">Popular Categories</h3>
           <div className="space-y-6">
              {[
@@ -150,7 +188,7 @@ export const Dashboard: React.FC = () => {
   );
 
   const PostsTab = () => (
-    <div className="bg-white border border-gray-100 shadow-sm rounded-[2.5rem] overflow-hidden">
+    <div className="posts-table bg-white border border-gray-100 shadow-sm rounded-[2.5rem] overflow-hidden">
       <div className="px-8 py-6 border-b border-gray-100 flex flex-col sm:flex-row justify-between items-center gap-4">
         <h3 className="text-xl font-bold text-gray-900">Content Management</h3>
         <div className="flex gap-3 w-full sm:w-auto">
@@ -224,7 +262,7 @@ export const Dashboard: React.FC = () => {
   );
 
   const AiAssistantTab = () => (
-    <div className="max-w-4xl mx-auto">
+    <div className="ai-container max-w-4xl mx-auto">
       <div className="bg-gradient-to-br from-indigo-50 to-purple-50 rounded-[2.5rem] p-8 border border-indigo-100">
         <div className="flex items-center gap-4 mb-8">
           <div className="bg-white p-3 rounded-2xl shadow-sm">
@@ -294,7 +332,7 @@ export const Dashboard: React.FC = () => {
   );
 
   return (
-    <div className="px-4 md:px-12 py-8">
+    <div ref={containerRef} className="px-4 md:px-12 py-8">
       <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-8">
         <div>
            <h1 className="text-3xl font-bold text-gray-900">Dashboard</h1>

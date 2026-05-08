@@ -1,8 +1,13 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { fetchPosts } from '../services/contentService.ts';
 import { ViewState, BlogPost } from '../types.ts';
 import { ArrowRight, Check, PlayCircle, Loader2, ArrowUpRight, ShieldCheck, HeartPulse, Zap } from 'lucide-react';
 import { LineChart, Line, ResponsiveContainer } from 'recharts';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
+import { ScrollTrigger } from 'gsap/ScrollTrigger';
+
+gsap.registerPlugin(ScrollTrigger);
 
 interface LandingPageProps {
   onNavigate: (view: ViewState) => void;
@@ -15,6 +20,7 @@ const TINY_CHART_DATA = [
 export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
   const [latestPosts, setLatestPosts] = useState<BlogPost[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loadPosts = async () => {
@@ -25,11 +31,64 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
     loadPosts();
   }, []);
 
+  useGSAP(() => {
+    // Hero Animation
+    gsap.from(".hero-content > *", {
+      y: 50,
+      opacity: 0,
+      duration: 0.8,
+      stagger: 0.2,
+      ease: "power3.out",
+      delay: 0.2
+    });
+
+    // Bento Grid Animation
+    gsap.from(".bento-card", {
+      scrollTrigger: {
+        trigger: ".bento-grid",
+        start: "top 80%",
+      },
+      y: 80,
+      opacity: 0,
+      duration: 0.8,
+      stagger: 0.15,
+      ease: "power2.out"
+    });
+
+    // Posts Animation
+    if (!isLoading) {
+      gsap.from(".post-card", {
+        scrollTrigger: {
+          trigger: ".posts-grid",
+          start: "top 85%",
+        },
+        y: 50,
+        opacity: 0,
+        duration: 0.6,
+        stagger: 0.1,
+        ease: "power2.out"
+      });
+    }
+
+    // Newsletter Animation
+    gsap.from(".newsletter-section", {
+      scrollTrigger: {
+        trigger: ".newsletter-section",
+        start: "top 90%",
+      },
+      scale: 0.95,
+      opacity: 0,
+      duration: 0.8,
+      ease: "back.out(1.7)"
+    });
+
+  }, { scope: containerRef, dependencies: [isLoading] });
+
   return (
-    <div className="bg-white px-4 md:px-12 pb-12">
+    <div ref={containerRef} className="bg-white px-4 md:px-12 pb-12">
       
       {/* Hero Section */}
-      <div className="relative rounded-[3rem] bg-[#89A8B2] overflow-hidden min-h-[500px] flex items-center mb-12">
+      <div className="relative rounded-[3rem] bg-[#89A8B2] overflow-hidden min-h-[500px] flex items-center mb-12 transform transition-transform">
         {/* Overlay Image Background */}
         <div className="absolute inset-0 z-0">
           <img 
@@ -40,10 +99,12 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
           <div className="absolute inset-0 bg-gradient-to-r from-[#597E8D] to-transparent opacity-90"></div>
         </div>
 
-        <div className="relative z-10 w-full max-w-4xl mx-auto text-center px-4 py-16">
-          <div className="inline-flex items-center px-3 py-1 rounded-full bg-white/20 text-white text-sm font-medium backdrop-blur-sm mb-6">
-            <HeartPulse className="w-4 h-4 mr-2" />
-            Science-backed Nutrition
+        <div className="hero-content relative z-10 w-full max-w-4xl mx-auto text-center px-4 py-16">
+          <div className="flex justify-center">
+            <div className="inline-flex items-center px-3 py-1 rounded-full bg-white/20 text-white text-sm font-medium backdrop-blur-sm mb-6">
+              <HeartPulse className="w-4 h-4 mr-2" />
+              Science-backed Nutrition
+            </div>
           </div>
           <h1 className="text-4xl md:text-6xl font-bold text-white tracking-tight mb-6 leading-tight">
             Fueling life growth through <br/> nutritional well-being
@@ -54,11 +115,11 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <button 
               onClick={() => onNavigate('library')}
-              className="px-8 py-4 bg-white text-[#597E8D] rounded-full font-bold hover:bg-blue-50 transition-colors shadow-lg"
+              className="px-8 py-4 bg-white text-[#597E8D] rounded-full font-bold hover:bg-blue-50 transition-colors shadow-lg hover:scale-105 active:scale-95 duration-200"
             >
               Start Learning
             </button>
-            <button className="px-8 py-4 bg-[#597E8D] border border-white/30 text-white rounded-full font-bold hover:bg-[#4A6A76] transition-colors flex items-center backdrop-blur-sm">
+            <button className="px-8 py-4 bg-[#597E8D] border border-white/30 text-white rounded-full font-bold hover:bg-[#4A6A76] transition-colors flex items-center backdrop-blur-sm hover:scale-105 active:scale-95 duration-200">
               <PlayCircle className="w-5 h-5 mr-2" />
               Watch Demo
             </button>
@@ -67,10 +128,10 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
       </div>
 
       {/* Bento Grid Stats Section */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-6 mb-20">
+      <div className="bento-grid grid grid-cols-1 md:grid-cols-12 gap-6 mb-20">
         
         {/* Card 1: Main Stat (Tall) */}
-        <div className="col-span-1 md:col-span-3 bg-[#E3F2FD] rounded-[2.5rem] p-8 flex flex-col justify-between h-80 transition-transform hover:-translate-y-1">
+        <div className="bento-card col-span-1 md:col-span-3 bg-[#E3F2FD] rounded-[2.5rem] p-8 flex flex-col justify-between h-80 transition-transform hover:-translate-y-1">
           <div>
             <h3 className="text-5xl font-extrabold text-[#1565C0] mb-2">10x</h3>
             <p className="text-[#1E88E5] font-medium leading-snug">
@@ -87,7 +148,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
         </div>
 
         {/* Card 2: Returning Customers (Wide) */}
-        <div className="col-span-1 md:col-span-5 bg-[#F0FDF4] rounded-[2.5rem] p-8 relative overflow-hidden transition-transform hover:-translate-y-1">
+        <div className="bento-card col-span-1 md:col-span-5 bg-[#F0FDF4] rounded-[2.5rem] p-8 relative overflow-hidden transition-transform hover:-translate-y-1">
           <div className="flex justify-between items-start mb-6">
             <div>
               <div className="flex items-center gap-2 mb-2">
@@ -99,101 +160,94 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
               <h3 className="text-2xl font-bold text-gray-900">Returning Health Seekers</h3>
             </div>
             <div className="bg-emerald-200 text-emerald-800 px-3 py-1 rounded-full text-xs font-bold">
-              +20,000
+              +20%
             </div>
           </div>
-          <div className="h-40 w-full mt-4">
-            <ResponsiveContainer width="100%" height="100%">
-               <LineChart data={TINY_CHART_DATA}>
-                 <Line type="basis" dataKey="val" stroke="#10B981" strokeWidth={4} dot={false} />
-                 <defs>
-                   <linearGradient id="colorVal" x1="0" y1="0" x2="0" y2="1">
-                     <stop offset="5%" stopColor="#10B981" stopOpacity={0.1}/>
-                     <stop offset="95%" stopColor="#10B981" stopOpacity={0}/>
-                   </linearGradient>
-                 </defs>
-               </LineChart>
-             </ResponsiveContainer>
+          <div className="grid grid-cols-2 gap-4 mt-8">
+            <div className="bg-white/60 p-4 rounded-2xl backdrop-blur-sm">
+              <div className="text-3xl font-bold text-emerald-900">2.4k</div>
+              <div className="text-emerald-700 text-sm font-medium">Monthly Active</div>
+            </div>
+             <div className="bg-white/60 p-4 rounded-2xl backdrop-blur-sm">
+              <div className="text-3xl font-bold text-emerald-900">98%</div>
+              <div className="text-emerald-700 text-sm font-medium">Satisfaction</div>
+            </div>
           </div>
-          <p className="text-emerald-600 text-sm mt-2">Consistent engagement across 40+ countries.</p>
         </div>
 
-        {/* Card 3: Satisfaction (Square) */}
-        <div className="col-span-1 md:col-span-4 bg-white border border-gray-100 shadow-xl shadow-gray-100/50 rounded-[2.5rem] p-8 flex flex-col justify-center items-center text-center transition-transform hover:-translate-y-1">
-          <div className="relative">
-             <div className="text-6xl font-black text-gray-900 mb-2">88%</div>
-             <ShieldCheck className="w-8 h-8 text-emerald-500 absolute -top-2 -right-6" />
-          </div>
-          <p className="text-gray-500 font-medium">
-            Of members see clinical improvement in their metabolic health within 3 months.
-          </p>
-        </div>
-
-        {/* Card 4: Savings (Square) */}
-        <div className="col-span-1 md:col-span-4 bg-[#FFF8E1] rounded-[2.5rem] p-8 flex flex-col justify-between transition-transform hover:-translate-y-1">
-           <div>
-             <h3 className="text-3xl font-bold text-amber-900">$614k</h3>
-             <p className="text-amber-800/80 text-sm mt-1">Healthcare savings generated for our community members.</p>
-           </div>
-           <div className="flex -space-x-3 mt-4">
-              {[1,2,3,4].map(i => (
-                <img key={i} className="w-10 h-10 rounded-full border-2 border-white" src={`https://picsum.photos/id/${100+i}/100/100`} alt="User" />
-              ))}
-              <div className="w-10 h-10 rounded-full border-2 border-white bg-amber-200 flex items-center justify-center text-xs font-bold text-amber-800">+2k</div>
-           </div>
-        </div>
-
-         {/* Card 5: Mobile App (Wide with Image) */}
-         <div className="col-span-1 md:col-span-8 bg-[#EEF2FF] rounded-[2.5rem] p-8 md:p-0 flex flex-col md:flex-row items-center overflow-hidden transition-transform hover:-translate-y-1">
-            <div className="p-8 md:p-12 md:w-1/2">
-               <div className="inline-block bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-xs font-bold mb-4">
-                 NEW FEATURE
+        {/* Card 3: Community (Square) */}
+        <div className="bento-card col-span-1 md:col-span-4 bg-[#FFF8E1] rounded-[2.5rem] p-8 flex flex-col justify-center items-center text-center transition-transform hover:-translate-y-1">
+           <div className="mb-4 relative">
+             <div className="flex -space-x-3">
+               {[1, 2, 3].map(i => (
+                 <img key={i} className="w-10 h-10 rounded-full border-2 border-white" src={`https://picsum.photos/id/${100+i}/50/50`} alt="User" />
+               ))}
+               <div className="w-10 h-10 rounded-full border-2 border-white bg-amber-400 flex items-center justify-center text-amber-900 font-bold text-xs">
+                 +5k
                </div>
-               <h3 className="text-3xl font-bold text-gray-900 mb-4">Expert access in your pocket</h3>
-               <p className="text-gray-600 mb-6">
-                 Connect with certified nutritionists directly through our platform. Get personalized advice anytime, anywhere.
-               </p>
-               <button onClick={() => onNavigate('work')} className="text-indigo-600 font-bold flex items-center hover:underline">
-                 Learn about our specialists <ArrowRight className="w-4 h-4 ml-2" />
-               </button>
-            </div>
-            <div className="md:w-1/2 h-full flex items-end justify-center bg-indigo-50">
-               <img 
-                 src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80" 
-                 className="w-full h-full object-cover md:rounded-tl-[2.5rem]"
-                 alt="Doctor"
-               />
-            </div>
-         </div>
+             </div>
+           </div>
+           <h3 className="text-2xl font-bold text-amber-900 mb-2">Join the Community</h3>
+           <p className="text-amber-800/80 text-sm mb-4">Connect with like-minded individuals.</p>
+           <button 
+             onClick={() => onNavigate('login')}
+             className="px-6 py-2 bg-amber-900 text-white rounded-xl text-sm font-bold w-full hover:bg-amber-800"
+            >
+             Join Now
+           </button>
+        </div>
       </div>
 
-      {/* Latest Content Preview */}
-      <div className="mb-12">
+      {/* Latest Articles Section */}
+      <div className="mb-20">
         <div className="flex justify-between items-end mb-8 px-2">
-           <div>
-             <h2 className="text-3xl font-bold text-gray-900">Latest from the Lab</h2>
-             <p className="text-gray-500 mt-2">Fresh insights and research summaries.</p>
-           </div>
-           <button onClick={() => onNavigate('library')} className="hidden md:flex items-center text-emerald-800 font-bold hover:text-emerald-600">
-             View Library <ArrowUpRight className="w-4 h-4 ml-1" />
-           </button>
+          <div>
+             <h2 className="text-3xl font-bold text-gray-900 tracking-tight">Latest from the Library</h2>
+             <p className="text-gray-500 mt-2">Expert-curated content to guide your journey.</p>
+          </div>
+          <button 
+            onClick={() => onNavigate('library')}
+            className="hidden sm:flex items-center text-emerald-700 font-bold hover:text-emerald-800 group"
+          >
+            View all <ArrowRight className="w-4 h-4 ml-2 transition-transform group-hover:translate-x-1" />
+          </button>
         </div>
 
         {isLoading ? (
-          <div className="flex justify-center py-12">
-            <Loader2 className="animate-spin h-8 w-8 text-emerald-500" />
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {[1, 2, 3].map((i) => (
+              <div key={i} className="h-96 rounded-[2rem] bg-gray-100 animate-pulse"></div>
+            ))}
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          <div className="posts-grid grid grid-cols-1 md:grid-cols-3 gap-8">
             {latestPosts.map((post) => (
-              <div key={post.id} className="group cursor-pointer" onClick={() => onNavigate('library')}>
-                <div className="rounded-[2rem] overflow-hidden mb-4 h-64 shadow-sm group-hover:shadow-md transition-shadow">
-                  <img src={post.imageUrl} alt={post.title} className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-500" />
+              <div 
+                key={post.id} 
+                className="post-card group relative flex flex-col justify-end overflow-hidden rounded-[2.5rem] bg-gray-100 h-[28rem] cursor-pointer"
+                onClick={() => onNavigate('library')}
+              >
+                <img 
+                  src={post.imageUrl} 
+                  alt={post.title} 
+                  className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+                <div className="relative p-8 text-white">
+                  <span className="inline-block px-3 py-1 bg-white/20 backdrop-blur-md rounded-lg text-xs font-bold mb-3 border border-white/10">
+                    {post.category}
+                  </span>
+                  <h3 className="text-2xl font-bold leading-tight mb-2 group-hover:underline decoration-2 underline-offset-4">
+                    {post.title}
+                  </h3>
+                  <div className="flex items-center gap-2 text-sm text-gray-300">
+                    <span>{post.readTime}</span>
+                    <span>•</span>
+                    <span>{post.date}</span>
+                  </div>
                 </div>
-                <div className="px-2">
-                  <span className="text-xs font-bold text-emerald-600 uppercase tracking-wide bg-emerald-50 px-2 py-1 rounded-md">{post.category}</span>
-                  <h3 className="text-xl font-bold text-gray-900 mt-3 mb-2 leading-snug group-hover:text-emerald-700 transition-colors">{post.title}</h3>
-                  <p className="text-gray-500 text-sm line-clamp-2">{post.excerpt}</p>
+                <div className="absolute top-6 right-6 bg-white/20 backdrop-blur-md p-3 rounded-full opacity-0 group-hover:opacity-100 transition-opacity transform translate-y-2 group-hover:translate-y-0">
+                  <ArrowUpRight className="w-5 h-5 text-white" />
                 </div>
               </div>
             ))}
@@ -201,24 +255,35 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onNavigate }) => {
         )}
       </div>
 
-      {/* Newsletter Block */}
-      <div className="bg-[#1F2937] rounded-[2.5rem] p-12 text-center md:text-left md:flex md:items-center md:justify-between">
-         <div className="mb-8 md:mb-0 md:w-1/2">
-           <h2 className="text-3xl font-bold text-white mb-4">Join 50k+ Health Enthusiasts</h2>
-           <p className="text-gray-400 text-lg">Get weekly nutrition tips and myth-busting research directly in your inbox.</p>
-         </div>
-         <div className="md:w-5/12">
-            <div className="flex flex-col sm:flex-row gap-3">
-               <input 
-                 type="email" 
-                 placeholder="Enter your email" 
-                 className="flex-1 px-6 py-4 rounded-full bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-emerald-500"
-               />
-               <button className="px-8 py-4 bg-emerald-500 text-white font-bold rounded-full hover:bg-emerald-400 transition-colors">
-                 Subscribe
-               </button>
-            </div>
-         </div>
+      {/* Newsletter Section */}
+      <div className="newsletter-section bg-gray-900 rounded-[3rem] p-8 md:p-16 text-center relative overflow-hidden">
+        <div className="absolute top-0 left-0 w-full h-full opacity-10">
+           <div className="absolute top-1/2 left-1/4 w-64 h-64 bg-emerald-500 rounded-full filter blur-[100px]"></div>
+           <div className="absolute bottom-0 right-1/4 w-64 h-64 bg-blue-500 rounded-full filter blur-[100px]"></div>
+        </div>
+        
+        <div className="relative z-10 max-w-2xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-bold text-white mb-6">
+            Get the weekly digest
+          </h2>
+          <p className="text-gray-400 mb-8 text-lg">
+            Join 50,000+ subscribers receiving the latest nutritional science, debunked myths, and practical guides directly to their inbox.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3">
+            <input 
+              type="email" 
+              placeholder="Enter your email address" 
+              className="flex-grow px-6 py-4 rounded-full bg-white/10 border border-white/10 text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-emerald-500 transition-all"
+            />
+            <button className="px-8 py-4 bg-emerald-500 text-white font-bold rounded-full hover:bg-emerald-400 transition-all shadow-lg hover:shadow-emerald-500/25">
+              Subscribe Free
+            </button>
+          </div>
+          <div className="mt-6 flex items-center justify-center gap-6 text-xs text-gray-500 font-medium">
+             <span className="flex items-center"><ShieldCheck className="w-3 h-3 mr-1" /> No spam, ever</span>
+             <span className="flex items-center"><Check className="w-3 h-3 mr-1" /> Unsubscribe anytime</span>
+          </div>
+        </div>
       </div>
 
     </div>

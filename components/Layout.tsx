@@ -1,6 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Menu, X, Leaf, LogOut, ArrowRight } from 'lucide-react';
 import { User, ViewState } from '../types.ts';
+import gsap from 'gsap';
+import { useGSAP } from '@gsap/react';
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -20,6 +22,43 @@ export const Layout: React.FC<LayoutProps> = ({
   onLogout
 }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const navRef = useRef<HTMLDivElement>(null);
+  const mainRef = useRef<HTMLElement>(null);
+
+  useGSAP(() => {
+    // Animate Nav Items on mount
+    const tl = gsap.timeline();
+    tl.from(".nav-logo", {
+      y: -20,
+      opacity: 0,
+      duration: 0.6,
+      ease: "power3.out"
+    })
+    .from(".nav-link", {
+      y: -20,
+      opacity: 0,
+      duration: 0.5,
+      stagger: 0.1,
+      ease: "power3.out"
+    }, "-=0.4")
+    .from(".nav-auth", {
+      y: -20,
+      opacity: 0,
+      duration: 0.5,
+      ease: "power3.out"
+    }, "-=0.3");
+
+  }, { scope: navRef });
+
+  // Simple page transition effect when view changes
+  useGSAP(() => {
+    if (mainRef.current) {
+      gsap.fromTo(mainRef.current, 
+        { opacity: 0, y: 15 },
+        { opacity: 1, y: 0, duration: 0.4, ease: "power2.out", clearProps: "all" }
+      );
+    }
+  }, [currentView]);
 
   const NavLink = ({ view, label }: { view: ViewState, label: string }) => (
     <button
@@ -27,7 +66,7 @@ export const Layout: React.FC<LayoutProps> = ({
         onNavigate(view);
         setIsMobileMenuOpen(false);
       }}
-      className={`text-sm font-bold tracking-tight transition-colors ${
+      className={`nav-link text-sm font-bold tracking-tight transition-colors ${
         currentView === view 
           ? 'text-emerald-700' 
           : 'text-gray-500 hover:text-gray-800'
@@ -40,13 +79,13 @@ export const Layout: React.FC<LayoutProps> = ({
   return (
     <div className="min-h-screen bg-white font-sans flex flex-col">
       {/* Navigation */}
-      <nav className="w-full bg-white z-50 border-b border-transparent">
+      <nav ref={navRef} className="w-full bg-white z-50 border-b border-transparent">
         <div className="max-w-[1440px] mx-auto px-6 py-6 md:px-10 relative">
           <div className="flex justify-between items-center h-12">
             
             {/* Left: Logo */}
             <div 
-              className="flex items-center gap-2 cursor-pointer z-10"
+              className="nav-logo flex items-center gap-2 cursor-pointer z-10"
               onClick={() => onNavigate('landing')}
             >
               <div className="bg-emerald-900 p-2 rounded-xl text-white">
@@ -66,7 +105,7 @@ export const Layout: React.FC<LayoutProps> = ({
             )}
             
             {/* Right: Auth / User Profile */}
-            <div className="hidden md:flex items-center z-10">
+            <div className="nav-auth hidden md:flex items-center z-10">
               {user ? (
                 <div 
                   onClick={() => user.role === 'admin' && onNavigate('dashboard')}
@@ -101,7 +140,7 @@ export const Layout: React.FC<LayoutProps> = ({
             </div>
 
             {/* Mobile Menu Button */}
-            <div className="flex items-center md:hidden z-10">
+            <div className="nav-auth flex items-center md:hidden z-10">
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="text-gray-500 hover:text-gray-700 focus:outline-none"
@@ -150,7 +189,7 @@ export const Layout: React.FC<LayoutProps> = ({
       </nav>
 
       {/* Content Area */}
-      <main className="flex-grow flex flex-col w-full max-w-[1440px] mx-auto">
+      <main ref={mainRef} className="flex-grow flex flex-col w-full max-w-[1440px] mx-auto">
         {children}
       </main>
 
